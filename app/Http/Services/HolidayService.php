@@ -30,7 +30,7 @@ class HolidayService
             $preparedRegion = '&region=' . $region;
         }
         try {
-            $url = Http::get("https://kayaposoft.com/enrico/json/v2.0?action=getHolidaysForYear&year=" . $year . "&country=" . $country . $preparedRegion . "&holidayType=public_holiday");
+            $url = Http::get("https://kayaposoft.com/enrico/json/v2.0?action=getHolidaysForYear&year=" . 1000 . "&country=" . $country . $preparedRegion . "&holidayType=public_holiday");
         } catch (\ErrorException $e) {
             abort(404);
         }

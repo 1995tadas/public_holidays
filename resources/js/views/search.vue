@@ -26,7 +26,9 @@
                    v-model="year" required>
         </div>
         <div v-if=!countries.error class="row mt-4 w-50">
-            <button type="button" @click.prevent="validateData" class="btn btn-secondary w-100">Ieškoti</button>
+            <button :disabled="!countryCode" type="button" @click.prevent="validateData"
+                    class="btn btn-secondary w-100">Ieškoti
+            </button>
         </div>
         <div class="alert alert-danger mt-4" v-show="Object.keys(errors).length">
             <div v-for="error in errors">{{ error[0] }}</div>
