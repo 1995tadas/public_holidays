@@ -78,7 +78,7 @@ class HolidayService
                     $data['streak'] = 1;
                 }
             } else if ($currentDate->day === 1) {
-                $lastMonthDay = Carbon::parse($year . '-' . $date['month'])->endOfMonth()->format('d');
+                $lastMonthDay = Carbon::parse($year . '-' . ($date['month'] - 1))->endOfMonth()->format('d');
                 if ($date['month'] === $currentDate->month - 1 && $date['day'] === $lastMonthDay) {
                     $data['streak']++;
                 } else if (!($date['month'] === $currentDate->month && $date['day'] === $currentDate->day)) {
@@ -93,7 +93,7 @@ class HolidayService
 
 
         if ($date['week'] === 5 || $date['week'] === 6) {
-            $lasMonthDay = Carbon::parse($year . '-' . $date['month'])->endOfMonth()->format('d');
+            $lastMonthDay = Carbon::parse($year . '-' . $date['month'])->endOfMonth()->format('d');
             if ($date['week'] === 5) {
                 $data['streak'] += 2;
                 $date['week'] = 7;
@@ -103,8 +103,8 @@ class HolidayService
                 $date['day']++;
                 $date['week'] = 7;
             }
-            if ($date['day'] > $lasMonthDay) {
-                $date['day'] = $date['day'] - $lasMonthDay;
+            if ($date['day'] > $lastMonthDay) {
+                $date['day'] = $date['day'] - $lastMonthDay;
                 $date['month']++;
             }
         }
