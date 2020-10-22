@@ -1,8 +1,6 @@
 <?php
 
-
 namespace App\Http\Services;
-
 
 use App\Http\Controllers\HolidayController;
 use Carbon\Carbon;
@@ -49,7 +47,6 @@ class HolidayService
         $count = 0;
         foreach (json_decode($url->body()) as $holiday) {
             $longestStreak = $this->holidaysInARow($holiday->date, $year, $longestStreak);
-//            dump($longestStreak.'streak');
             foreach ($holiday->name as $name) {
                 if ($name->lang === 'en') {
                     $month = date("F", mktime(0, 0, 0, $holiday->date->month));
@@ -62,7 +59,6 @@ class HolidayService
         $response = [
             'holidays' => $listOfHolidays,
             'total' => $count,
-//            'longestStreak' => 3
             'longestStreak' => $longestStreak['data']['record'],
         ];
         $holidayController = new HolidayController();

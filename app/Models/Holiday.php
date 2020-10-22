@@ -16,6 +16,7 @@ class Holiday extends Model
         if ($region) {
             $yearCombinationModel = $yearCombinationModel->where('region', $region);
         }
+
         $yearCombinationModel = $yearCombinationModel->first();
         if (!$yearCombinationModel) {
             return $yearCombinationModel;

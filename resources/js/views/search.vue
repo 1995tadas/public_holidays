@@ -1,31 +1,29 @@
 <template>
-    <div class="d-flex justify-content-center align-items-center flex-column bg-primary w-100 p-4 rounded"
+    <div class="d-flex justify-content-center align-items-center flex-column bg-primary w-100 my-2 p-4 rounded"
          @keydown.enter="validateData">
-        <h1>Public holidays search</h1>
+        <h1 class="text-center">Public holidays search</h1>
         <div class="row w-100 text-center">
             <label v-if=!countries.error class="col" for="countries">Available countries</label>
             <label class="col" v-show="regions.length" for="regions">Available regions</label>
             <label class="col" v-show="Object.keys(yearsRange).length" for="years">Possible years</label>
         </div>
-        <div class="row w-100">
-            <template v-if=!countries.error>
-                <select id="countries" class="col p-2" @change="onChange()"
-                        v-model="countryCode" name="year" required>
-                    <option selected="selected" disabled="disabled">Select a country</option>
-                    <option v-for="n in countries" :value="n.countryCode">{{ n.fullName }}</option>
-                </select>
-                <select v-show="regions.length" id="regions" class="col p-2 ml-1"
-                        v-model="region" name="region" required>
-                    <option selected="selected" disabled="disabled">Select a region</option>
-                    <option v-for="n in regions" :value="n">{{ n }}</option>
-                </select>
-                <input id="years" class="col p-2 ml-1" type="number"
-                       v-show="Object.keys(yearsRange).length"
-                       :min="yearsRange.fromDate"
-                       :max="yearsRange.toDate"
-                       :placeholder="yearsRange.fromDate+' - '+ yearsRange.toDate"
-                       v-model="year" required>
-            </template>
+        <div v-if=!countries.error class="row w-100">
+            <select id="countries" class="col p-2" @change="onChange()"
+                    v-model="countryCode" name="year" required>
+                <option selected="selected" disabled="disabled">Select a country</option>
+                <option v-for="country in countries" :value="country.countryCode">{{ country.fullName }}</option>
+            </select>
+            <select v-show="regions.length" id="regions" class="col p-2 ml-1"
+                    v-model="region" name="region" required>
+                <option selected="selected" disabled="disabled">Select a region</option>
+                <option v-for="region in regions" :value="region">{{ region }}</option>
+            </select>
+            <input id="years" class="col p-2 ml-1" type="number"
+                   v-show="Object.keys(yearsRange).length"
+                   :min="yearsRange.fromDate"
+                   :max="yearsRange.toDate"
+                   :placeholder="yearsRange.fromDate+' - '+ yearsRange.toDate"
+                   v-model="year" required>
         </div>
         <div v-if=!countries.error class="row mt-4 w-50">
             <button type="button" @click.prevent="validateData" class="btn btn-secondary w-100">Ieškoti</button>
