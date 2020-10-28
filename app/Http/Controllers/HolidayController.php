@@ -7,6 +7,7 @@ use App\Http\Services\HolidayService;
 use App\Models\Holiday;
 use App\Models\YearCombination;
 use Carbon\Carbon;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Http;
 
 class HolidayController extends Controller
@@ -27,7 +28,12 @@ class HolidayController extends Controller
         $yearCombinationModel = new YearCombination();
         $holidayService = new HolidayService();
         $preparedData = $holidayService->prepareDataForStoring($year, $country, $data, $region);
-        $created = $yearCombinationModel::create($preparedData);
+        try {
+            $created = $yearCombinationModel::create($preparedData);
+        } catch (QueryException $e) {
+            return $e;
+        }
+
         if ($created) {
             $holidayModel = new Holiday();
             $date = [];
@@ -40,6 +46,7 @@ class HolidayController extends Controller
                         'year_combination_id' => $created->id];
                 }
             }
+
             return $holidayModel::insert($date);
         }
     }
@@ -53,7 +60,7 @@ class HolidayController extends Controller
             $response = $dataFromDatabase;
         } else {
             $holidayService = new HolidayService();
-            $response = $holidayService->getFromApi($request->year, $request->country, $request->region);
+            $response = $holidayService->getHolidaysFromApi($request->year, $request->country, $request->region);
             if (array_key_exists('error', $response)) {
                 return response()->json($response);
             }
