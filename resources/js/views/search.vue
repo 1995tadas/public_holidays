@@ -10,12 +10,12 @@
         <div v-if=!countries.error class="row w-100">
             <select id="countries" class="col p-2" @change="getYears()"
                     v-model="countryCode" name="year" required>
-                <option selected="selected" disabled="disabled">Select a country</option>
+                <option selected="selected" disabled="disabled" value = "">Select a country</option>
                 <option v-for="country in countries" :value="country.countryCode">{{ country.fullName }}</option>
             </select>
             <select v-show="regions.length" id="regions" class="col p-2 ml-1"
                     v-model="region" name="region" required>
-                <option selected="selected" disabled="disabled">Select a region</option>
+                <option selected="selected" disabled="disabled" value = "">Select a region</option>
                 <option v-for="region in regions" :value="region">{{ region }}</option>
             </select>
             <input id="years" class="col p-2 ml-1" type="number"
