@@ -8,7 +8,7 @@
             <label class="col" v-show="Object.keys(yearsRange).length" for="years">Possible years</label>
         </div>
         <div v-if=!countries.error class="row w-100">
-            <select id="countries" class="col p-2" @change="onChange()"
+            <select id="countries" class="col p-2" @change="getYears()"
                     v-model="countryCode" name="year" required>
                 <option selected="selected" disabled="disabled">Select a country</option>
                 <option v-for="country in countries" :value="country.countryCode">{{ country.fullName }}</option>
@@ -26,7 +26,7 @@
                    v-model="year" required>
         </div>
         <div v-if=!countries.error class="row mt-4 w-50">
-            <button :disabled="!countryCode" type="button" @click.prevent="validateData"
+            <button :disabled="buttonStatus" type="button" @click.prevent="validateData"
                     class="btn btn-secondary w-100">Ieškoti
             </button>
         </div>
@@ -75,12 +75,9 @@ export default {
         }
     },
     methods: {
-        onChange() {
-            this.getYears(this.countryCode);
-        },
-        getYears(code) {
+        getYears() {
             for (const country of this.countries) {
-                if (code === country.countryCode) {
+                if (this.countryCode === country.countryCode) {
                     this.yearsRange['fromDate'] = country.fromDate.year;
                     this.yearsRange['toDate'] = country.toDate.year;
                     this.getRegion(country);
@@ -126,9 +123,14 @@ export default {
                     }
                 }
             ).catch((response) => {
-                    console.log(this.errors)
+                    console.log(response)
                 }
             )
+        }
+    },
+    computed: {
+        buttonStatus() {
+            return this.countryCode === '' || this.year === '' || (this.regions.length ? this.region === '' : false);
         }
     },
     created() {
