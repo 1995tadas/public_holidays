@@ -53,9 +53,8 @@ class HolidayController extends Controller
 
     public function show(HolidayRequest $request)
     {
-        $holiday = new Holiday();
         $holidayService = new HolidayService();
-        $dataFromDatabase = $holiday->getHolidaysFromDatabase($request->year, $request->country, $request->region);
+        $dataFromDatabase = $holidayService->getHolidaysFromDatabase($request->year, $request->country, $request->region);
         if ($dataFromDatabase) {
             $response = $dataFromDatabase;
         } else {

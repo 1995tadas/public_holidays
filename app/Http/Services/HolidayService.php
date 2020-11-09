@@ -3,11 +3,62 @@
 namespace App\Http\Services;
 
 use App\Http\Controllers\HolidayController;
+use App\Models\Holiday;
+use App\Models\YearCombination;
 use Carbon\Carbon;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Http;
 
 class HolidayService
 {
+
+    public function getHolidaysFromDatabase(int $year, string $country, ?string $region = '')
+    {
+        $yearCombinationModel = YearCombination::where('year', $year)->where('country', $country);
+        if ($region) {
+            $yearCombinationModel = $yearCombinationModel->where('region', $region);
+        }
+
+        try {
+            $yearCombinationModel = $yearCombinationModel->first();
+        } catch (QueryException $e) {
+            return false;
+        }
+
+        if (!$yearCombinationModel) {
+            return false;
+        }
+
+        $listOfHolidays = $this->getHolidaysByYearCombination($yearCombinationModel->id);
+        if ($listOfHolidays) {
+            return [
+                'holidays' => $listOfHolidays,
+                'total' => $yearCombinationModel->total,
+                'longestStreak' => $yearCombinationModel->streak,
+            ];
+        }
+
+        return false;
+    }
+
+    public function getHolidaysByYearCombination(int $yearCombinationId): array
+    {
+
+        $holidayModel = Holiday::where('year_combination_id', $yearCombinationId)->get();
+        if (!$holidayModel) {
+            return $holidayModel;
+        }
+
+        $listOfHolidays = [];
+        foreach ($holidayModel as $holiday) {
+            $carbon = Carbon::parse($holiday->date);
+            $month = $carbon->format('F');
+            $day = $carbon->day;
+            $listOfHolidays[$month][$day] = $holiday->name;
+        }
+
+        return $listOfHolidays;
+    }
     public function prepareDataForStoring(int $year, string $country, array $data, ?string $region)
     {
         $preparedData = [
