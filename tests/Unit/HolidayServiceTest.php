@@ -78,7 +78,7 @@ class HolidayServiceTest extends TestCase
      */
     public function testInitAPI(int $year, string $country, array $expectation, ?string $region = '')
     {
-        $data = $this->holidayService->initAPI($year, $country, $region);
+        $data = $this->holidayService->fetchDataFromApi($year, $country, $region);
         $this->assertCount(
             $expectation['count'],
             $data
@@ -124,7 +124,7 @@ class HolidayServiceTest extends TestCase
      */
     public function testHolidaysInARow(int $year, string $country, int $expectation, ?string $region = '')
     {
-        $holidays = $this->holidayService->initAPI($year, $country, $region);
+        $holidays = $this->holidayService->fetchDataFromApi($year, $country, $region);
         $longestStreak = [
             'date' => ['week' => 0, 'day' => 0, 'month' => 0],
             'data' => ['streak' => 1, 'record' => 1]

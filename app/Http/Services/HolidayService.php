@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Http;
 class HolidayService
 {
 
-    public function getHolidaysFromDatabase(int $year, string $country, ?string $region = '')
+    public function getHolidaysFromDatabase(int $year, string $country, ?string $region = ''): array
     {
         $yearCombinationModel = YearCombination::where('year', $year)->where('country', $country);
         if ($region) {
@@ -22,11 +22,11 @@ class HolidayService
         try {
             $yearCombinationModel = $yearCombinationModel->first();
         } catch (QueryException $e) {
-            return false;
+            return [];
         }
 
         if (!$yearCombinationModel) {
-            return false;
+            return [];
         }
 
         $listOfHolidays = $this->getHolidaysByYearCombination($yearCombinationModel->id);
@@ -38,7 +38,7 @@ class HolidayService
             ];
         }
 
-        return false;
+        return [];
     }
 
     public function getHolidaysByYearCombination(int $yearCombinationId): array
@@ -59,7 +59,8 @@ class HolidayService
 
         return $listOfHolidays;
     }
-    public function prepareDataForStoring(int $year, string $country, array $data, ?string $region)
+
+    public function prepareDataForStoring(int $year, string $country, array $data, ?string $region): array
     {
         $preparedData = [
             'year' => $year,
@@ -76,7 +77,7 @@ class HolidayService
 
     public function getHolidaysFromApi(int $year, string $country, ?string $region = '')
     {
-        $holidays = $this->initAPI($year, $country, $region);
+        $holidays = $this->fetchDataFromApi($year, $country, $region);
         if (array_key_exists('error', $holidays)) {
             return $holidays;
         }
@@ -109,7 +110,7 @@ class HolidayService
     }
 
 
-    public function initAPI(int $year, string $country, ?string $region = '')
+    public function fetchDataFromApi(int $year, string $country, ?string $region = ''): array
     {
         $preparedRegion = '';
         if (!empty($region)) {
@@ -119,13 +120,13 @@ class HolidayService
         try {
             $url = Http::get("https://kayaposoft.com/enrico/json/v2.0?action=getHolidaysForYear&year=" . $year . "&country=" . $country . $preparedRegion . "&holidayType=public_holiday");
         } catch (\ErrorException $e) {
-            return abort(404);
+            abort(404);
         }
 
         return $url->json();
     }
 
-    public function holidaysInARow(array $currentDate, int $year, array $longestStrike)
+    public function holidaysInARow(array $currentDate, int $year, array $longestStrike): array
     {
         $date = $longestStrike['date'];
         $data = $longestStrike['data'];
@@ -175,7 +176,7 @@ class HolidayService
         return ['date' => $date, 'data' => $data];
     }
 
-    public function isTodayHoliday(array $listOfHolidays, $specificDate = false)
+    public function isTodayHoliday(array $listOfHolidays, string $specificDate = null): string
     {
         if ($specificDate) {
             $date = Carbon::parse($specificDate);
