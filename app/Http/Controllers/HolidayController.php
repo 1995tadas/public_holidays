@@ -3,24 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\HolidayRequest;
+use App\Http\Services\CountryService;
 use App\Http\Services\HolidayService;
 use App\Models\Holiday;
 use App\Models\YearCombination;
 use Carbon\Carbon;
 use Illuminate\Database\QueryException;
-use Illuminate\Support\Facades\Http;
 
 class HolidayController extends Controller
 {
 
     public function create()
     {
-        try {
-            $url = Http::get("https://kayaposoft.com/enrico/json/v2.0?action=getSupportedCountries");
-            return view('holidays.create', ['countries' => $url->json()]);
-        } catch (\Exception $e) {
-            return abort(404);
-        }
+        $countryService = new CountryService();
+        $countries = $countryService->getCountries();
+        return view('holidays.create', compact('countries'));
     }
 
     public function store(array $data, int $year, string $country, $region = '')

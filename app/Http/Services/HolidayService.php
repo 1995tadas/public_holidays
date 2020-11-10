@@ -112,13 +112,19 @@ class HolidayService
 
     public function fetchDataFromApi(int $year, string $country, ?string $region = ''): array
     {
-        $preparedRegion = '';
+        $dataForApi = [
+            'action' => 'getHolidaysForYear',
+            'holidayType' => 'public_holiday',
+            'year' => $year,
+            'country' => $country
+        ];
+
         if (!empty($region)) {
-            $preparedRegion = '&region=' . $region;
+            $dataForApi['region'] = $region;
         }
 
         try {
-            $url = Http::get("https://kayaposoft.com/enrico/json/v2.0?action=getHolidaysForYear&year=" . $year . "&country=" . $country . $preparedRegion . "&holidayType=public_holiday");
+            $url = Http::get(config('app.api'), $dataForApi);
         } catch (\ErrorException $e) {
             abort(404);
         }
