@@ -11,8 +11,8 @@ class CountryService
     public function getCountries(): array
     {
         $countriesFromDatabase = $this->getCountriesFromDatabase();
-        if ($countriesFromDatabase->isNotEmpty()) {
-            //todo
+        if (!empty($countriesFromDatabase)) {
+            return $countriesFromDatabase;
         } else {
             return $this->getCountriesFromApi();
         }
@@ -29,9 +29,21 @@ class CountryService
         }
     }
 
-    protected function getCountriesFromDatabase(): object
+    protected function getCountriesFromDatabase()
     {
-        return Country::all();
+        $countries = Country::with('regions')->get(['countryCode', 'fullName', 'fromDate', 'toDate'])->toArray();
+        return $this->prepareCountriesFromDatabase($countries);
+    }
+
+    protected function prepareCountriesFromDatabase(array $countries): array
+    {
+        $dateService = new DateService();
+        foreach ($countries as $index => $country) {
+            $countries[$index]['fromDate'] = $dateService->splitDate($country['fromDate']);
+            $countries[$index]['toDate'] = $dateService->splitDate($country['toDate']);
+        }
+
+        return $countries;
     }
 
     protected function storeCountriesToDatabase(array $countries): void
@@ -39,10 +51,10 @@ class CountryService
         $countryModel = new Country();
         $dateService = new DateService();
         foreach ($countries as $country) {
-            $fromDate = $dateService->extractDateFromApi($country['fromDate']);
-            $toDate = $dateService->extractDateFromApi($country['toDate']);
+            $fromDate = $dateService->mergeDate($country['fromDate']);
+            $toDate = $dateService->mergeDate($country['toDate']);
             if ($fromDate && $toDate) {
-                $created = $countryModel::firstOrcreate([
+                $created = $countryModel::create([
                     'countryCode' => $country['countryCode'],
                     'fullName' => $country['fullName'],
                     'fromDate' => $fromDate,

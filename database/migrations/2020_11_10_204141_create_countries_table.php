@@ -17,8 +17,8 @@ class CreateCountriesTable extends Migration
             $table->id();
             $table->string('countryCode')->unique();
             $table->string('fullName')->unique();
-            $table->date('fromDate');
-            $table->date('toDate');
+            $table->string('fromDate');
+            $table->string('toDate');
             $table->timestamps();
         });
     }
