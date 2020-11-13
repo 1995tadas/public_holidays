@@ -29,10 +29,16 @@ class CountryService
         }
     }
 
-    protected function getCountriesFromDatabase()
+    protected function getCountriesFromDatabase(): array
     {
-        $countries = Country::with('regions')->get(['countryCode', 'fullName', 'fromDate', 'toDate'])->toArray();
-        return $this->prepareCountriesFromDatabase($countries);
+        $countries = Country::with(['regions' => function ($query) {
+            $query->select('country_id', 'region');
+        }])->get(['id', 'countryCode', 'fullName', 'fromDate', 'toDate'])->toArray();
+        if ($countries) {
+            return $this->prepareCountriesFromDatabase($countries);
+        }
+
+        return [];
     }
 
     protected function prepareCountriesFromDatabase(array $countries): array
@@ -41,6 +47,11 @@ class CountryService
         foreach ($countries as $index => $country) {
             $countries[$index]['fromDate'] = $dateService->splitDate($country['fromDate']);
             $countries[$index]['toDate'] = $dateService->splitDate($country['toDate']);
+            if ($countries[$index]['regions']) {
+                foreach ($countries[$index]['regions'] as $region_index => $region) {
+                    $countries[$index]['regions'][$region_index] = $region['region'];
+                }
+            }
         }
 
         return $countries;
@@ -70,6 +81,7 @@ class CountryService
     protected function storeCountryRegionsToDatabase(int $countryId, array $regions): bool
     {
         $regionModel = new Region();
+        $data = [];
         foreach ($regions as $region) {
             if (!empty($region)) {
                 $data[] = [
