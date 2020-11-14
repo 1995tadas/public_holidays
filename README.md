@@ -4,6 +4,10 @@
 * Mysql
 * Vue
 
+# DEMO
+
+https://public-holiday.herokuapp.com/
+
 ## How to deploy
 
 1. Rename env.example to .env and put your database credentials
